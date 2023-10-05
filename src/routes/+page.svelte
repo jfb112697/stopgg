@@ -1,14 +1,29 @@
 <!-- YOU CAN DELETE EVERYTHING IN THIS  -->
 
-<script>
-	import { user } from '../stores/user'; // Import the user store
+<script lang="ts">
+	import { userStore } from "sveltefire";
+	import {auth, firestore} from "../firebase";
+	import { docStore } from '../stores/docStore';
+
+	
 	function startOAuth() {
 		const clientId = '48';
 		const redirectUri = encodeURIComponent('https://us-central1-stopgg.cloudfunctions.net/oauthcallback');
 		const clientSecret = '0c3c9eb4048969116b8bea5d716bbf6831b31fb5f4a2a390d6c0f9ca2fc6e365';
 		const scope = encodeURIComponent('user.identity user.email tournament.manager');
-		window.location.href = `https://start.gg/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&client_secret=${clientSecret}`;
+		window.location.href = `https://start.gg/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
 	}
+
+	const user = userStore(auth);
+	interface UserDetails {
+		name: string
+	}
+	   let userDoc = docStore<UserDetails>(firestore, `users/${$user?.uid}`);
+
+	let userName: string | null = null;
+
+  $: userName = $userDoc?.name || null;
+
 </script>
 
 <div class="container h-full mx-auto flex justify-center items-center">
@@ -32,12 +47,11 @@
 		<!-- / -->
 		<div class="space-y-2">
 			{#if $user}
-				<h1>Welcome, {$user.name}!</h1>
-			{:else}
-				<button on:click={startOAuth} class="btn variant-filled-warning"
+				<h1>Welcome, {userName}!</h1>
+			{/if}
+				<button on:click={startOAuth} class="btn variant-outline-tertiary"
 					>Signin With start.gg</button
 				>
-			{/if}
 			<p><code class="code">/src/routes/+layout.svelte</code></p>
 			<p><code class="code">/src/routes/+.svelte</code></p>
 		</div>
