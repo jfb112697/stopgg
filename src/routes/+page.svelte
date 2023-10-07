@@ -1,30 +1,46 @@
 <!-- YOU CAN DELETE EVERYTHING IN THIS  -->
 
 <script lang="ts">
-	import { userStore } from "sveltefire";
-	import {auth, firestore} from "../firebase";
+	import { userStore } from 'sveltefire';
+	import { auth, firestore } from '../firebase';
 	import { docStore } from '../stores/docStore';
+	import { getTournament } from '../firebase';
 
-	
 	function startOAuth() {
 		const clientId = '48';
-		const redirectUri = encodeURIComponent('https://us-central1-stopgg.cloudfunctions.net/oauthcallback');
-		const clientSecret = '0c3c9eb4048969116b8bea5d716bbf6831b31fb5f4a2a390d6c0f9ca2fc6e365';
+		const redirectUri = encodeURIComponent(
+			'https://us-central1-stopgg.cloudfunctions.net/oauthcallback'
+		);
 		const scope = encodeURIComponent('user.identity user.email tournament.manager');
 		window.location.href = `https://start.gg/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
 	}
 
 	const user = userStore(auth);
 	interface UserDetails {
-		name: string
+		name: string;
 	}
-	   let userDoc = docStore<UserDetails>(firestore, `users/${$user?.uid}`);
+	let userDoc: any;
+	let tournamentSlug = '';
+
+	$: {
+		if ($user && $user.uid) {
+			userDoc = docStore<UserDetails>(firestore, `users/${$user.uid}`);
+		}
+	}
 
 	let userName: string | null = null;
 
-  $: userName = $userDoc?.name || null;
+	$: userName = $userDoc?.name || null;
 
+	async function manageTournament() {
+		try {
+			await getTournament({ tournamentSlug: tournamentSlug, uid: $user?.uid }).then((v) => {console.log(v);})
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
 </script>
+
 
 <div class="container h-full mx-auto flex justify-center items-center">
 	<div class="space-y-10 text-center flex flex-col items-center">
@@ -48,10 +64,14 @@
 		<div class="space-y-2">
 			{#if $user}
 				<h1>Welcome, {userName}!</h1>
-			{/if}
+				<h3>Let's get started, type the slug of a tournament you manage</h3>
+				<input bind:value={tournamentSlug} type="text" class="input variant-outline-secondary" />
+				<button on:click={manageTournament} class="btn variant-filled-primary">Manage</button>
+			{:else}
 				<button on:click={startOAuth} class="btn variant-outline-tertiary"
 					>Signin With start.gg</button
 				>
+			{/if}
 			<p><code class="code">/src/routes/+layout.svelte</code></p>
 			<p><code class="code">/src/routes/+.svelte</code></p>
 		</div>
