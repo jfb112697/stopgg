@@ -3,6 +3,7 @@
   export let events: { id: string; name: string; }[] = [];
   export let title: string = '';
   export let tournamentSlug: string = '';
+  console.log("what is happening here");
 </script>
 
 <div class="grid grid-cols-[auto_1fr] h-full bg-surface-50-900-token border-r border-surface-500/30">
@@ -15,7 +16,7 @@
     <ul>
       {#each events as { id, name }}
         <li>
-          <a href={`/tournaments/${tournamentSlug}/${id}`} class="...">
+          <a href="test">
             <span class="flex-auto">{name}</span>
           </a>
         </li>

@@ -1,0 +1,1 @@
+import{w as d}from"./index.db578063.js";import{k as l,I as b}from"./firebase.198aed50.js";function p(o,t,n){const{startWith:a=null,deserialize:c=e=>e}=n||{};let r;const s=typeof t=="string"?l(o,t):t,{subscribe:u}=d(a,e=>(r=b(s,i=>{e(i.exists()?c(i.data()):null)}),()=>r&&r()));return{subscribe:u,ref:s,id:s.id}}export{p as d};

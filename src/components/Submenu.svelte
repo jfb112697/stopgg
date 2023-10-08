@@ -15,7 +15,7 @@
     <ul>
       {#each events as event}
         <li>
-          <a href={`/tournament/${tournamentSlug}/event/${event.id}`} data-sveltekit-preload-data="hover">
+          <a href={`/tournament/${tournamentSlug}/${event.id}`} data-sveltekit-preload-data="hover">
             <span class="flex-auto">{event.name}</span>
           </a>
         </li>

@@ -41,6 +41,9 @@ $: {
     const q = query(tournamentsRef, where('managedBy', 'array-contains', $user.uid.toString()));
     userTournamentsStore = collectionStore(firestore, q);
   }
+  else{
+	userTournamentsStore = null;
+  }
 }
 
   let userName: string | null = null;
@@ -58,7 +61,7 @@ $: {
 	console.log($userTournamentsStore);
     eventsForCurrentTournament = currentTournament ? currentTournament.events : [];
 	}
-  }
+	}
 	onMount(async () => {
 		const urlParams = new URLSearchParams(window.location.search);
 		const token = urlParams.get('token');
@@ -101,13 +104,13 @@ $: {
 			<!-- App Bar -->
 			<AppBar>
 				<svelte:fragment slot="lead">
-					<strong on:click={() => console.log(tournamentSlug)} class="text-xl uppercase font-mono">cease.gg</strong>
+					<strong on:click={() => console.log($user?.uid)} class="text-xl uppercase font-mono">cease.gg</strong>
 				</svelte:fragment>
 				<svelte:fragment slot="trail">
 					
 					{#if userName && $user}
 					<a href="/">
-						<Avatar initials={userName.split(" ").map((w) => w.substring(0,1)).join("")} background="bg-primary-500" on:click={() => auth.signOut()}/>
+						<Avatar initials={userName.split(" ").map((w) => w.substring(0,1)).join("")} background="bg-primary-500" on:click={() => {auth.signOut()}}/>
 							</a>
 					{/if}
 				</svelte:fragment>

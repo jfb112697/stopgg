@@ -2,7 +2,7 @@
     import { page } from '$app/stores';
 	import { collectionStore, docStore, userStore } from 'sveltefire';
 	import { auth, firestore } from '../../../firebase';
-	import { ListBox, ListBoxItem, Paginator, type PaginationSettings, Table, type TableSource, tableMapperValues } from '@skeletonlabs/skeleton';
+	import { ListBox, ListBoxItem, Paginator, type PaginationSettings, Table, type TableSource, tableMapperValues, InputChip } from '@skeletonlabs/skeleton';
 	import { Query, collection, query, where } from 'firebase/firestore';
 	import SecondarySidebar from './SecondarySidebar.svelte';
 
@@ -58,13 +58,26 @@ $: {
 	let paginatedSource: any[] = [];
 
 	$:{ 
+		
 		if($entrantsStore) {
+		if (searchValue.length > 0) {
+			let source :any = $entrantsStore as any;
+			source = source.filter((e: any) => e.name.toLowerCase().includes(searchValue[0].toLowerCase()));			console.log(source);
+			if(source && source.length > 0){
+			paginationSettings.page = 0;
+			paginatedSource = (source as Array<any>).slice(
+			paginationSettings.page * paginationSettings.limit,
+			paginationSettings.page * paginationSettings.limit + paginationSettings.limit);
+			paginationSettings.size = (source as Array<any>).length;
+			}
+		}
+		else{
 			paginatedSource = ($entrantsStore as Array<any>).slice(
 			paginationSettings.page * paginationSettings.limit,
 			paginationSettings.page * paginationSettings.limit + paginationSettings.limit);
 			paginationSettings.size = ($entrantsStore as Array<any>).length;
 		}
-		
+	}
 	}
 
 $: tableSimple = {
@@ -73,16 +86,22 @@ $: tableSimple = {
 	meta: tableMapperValues(paginatedSource, ['name']),
 	foot: ['Total Entrants', '', `<span class="badge variant-soft-primary">${paginatedSource.length} Elements</span>`]
 };
+let searchValue: string[];
+
+$: {
+	
+}
 </script>
 <div class="container h-full mx-auto flex justify-center items-center">
 	<div class="space-y-10 text-center flex flex-col items-center">
         	<h2 class="h2"
 		on:click={() => {
-			console.log(tournamentSlug);
+			console.log($entrantsStore);
 		}}
 	>
 		View Signups
 	</h2>
+	<InputChip bind:value={searchValue} name="chips" placeholder="Search participants in the entire tournament" />
 	<div class="card p-4">
 		<Table source={tableSimple}/>
 			<Paginator
